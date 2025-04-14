@@ -1,0 +1,6 @@
+@EndavaGrowthspace_HostAddress = http://localhost:5201
+
+GET {{EndavaGrowthspace_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
