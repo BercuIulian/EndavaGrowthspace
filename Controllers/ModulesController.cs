@@ -3,9 +3,11 @@ using EndavaGrowthspace.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EndavaGrowthspace.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EndavaGrowthspace.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route ("api/[controller]")]
     public class ModulesController : ControllerBase

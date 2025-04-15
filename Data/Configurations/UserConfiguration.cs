@@ -8,14 +8,10 @@ namespace EndavaGrowthspace.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.HasKey(e => e.Id);
-
             builder.Property(e => e.FirstName)
-                .IsRequired()
                 .HasMaxLength(100);
 
             builder.Property(e => e.LastName)
-                .IsRequired()
                 .HasMaxLength(100);
         }
     }
