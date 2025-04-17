@@ -13,6 +13,11 @@ namespace EndavaGrowthspace.Data.Configurations
 
             builder.Property(e => e.LastName)
                 .HasMaxLength(100);
+
+            builder.HasMany(u => u.RefreshTokens)
+                .WithOne()
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

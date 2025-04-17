@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EndavaGrowthspace.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using EndavaGrowthspace.Constants;
 
 namespace EndavaGrowthspace.Controllers
 {
@@ -76,9 +77,11 @@ namespace EndavaGrowthspace.Controllers
                 return NotFound();
             }
 
-            if(course.CreatedBy != courseDto.UserId)
+            bool isAdmin = User.IsInRole(AuthorizationConstants.Roles.Admin) || User.IsInRole(AuthorizationConstants.Roles.Administrator);
+
+            if (!isAdmin && course.CreatedBy != courseDto.UserId)
             {
-                return Forbid("Only the creator can update the course :)");
+                return Forbid("Only the creator or the admin can update the course :)");
             }
 
             course.Title = courseDto.Title;
@@ -114,9 +117,11 @@ namespace EndavaGrowthspace.Controllers
                 return NotFound();
             }
 
-            if (course.CreatedBy != userId)
+            bool isAdmin = User.IsInRole(AuthorizationConstants.Roles.Admin) || User.IsInRole(AuthorizationConstants.Roles.Administrator);
+
+            if (!isAdmin && course.CreatedBy != userId)
             {
-                return Forbid("Only the creator can delete a course ;)");
+                return Forbid("Only the creator or the admin can delete a course ;)");
             }
 
             var modules = await _context.Modules.Where(m => m.CourseId == id).ToListAsync();

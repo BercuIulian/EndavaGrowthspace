@@ -9,6 +9,7 @@ namespace EndavaGrowthspace.Data
         DbSet<Course> Courses { get; set; }
         DbSet<Module> Modules { get; set; }
         DbSet<User> Users { get; set; }
+        DbSet<RefreshToken> RefreshTokens { get; set; }
         
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         int SaveChanges();

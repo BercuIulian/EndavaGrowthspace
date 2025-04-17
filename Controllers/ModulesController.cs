@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EndavaGrowthspace.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using EndavaGrowthspace.Constants;
 
 namespace EndavaGrowthspace.Controllers
 {
@@ -41,17 +42,17 @@ namespace EndavaGrowthspace.Controllers
             }
 
             bool isCreator = course.CreatedBy == userId || module.CreatedBy == userId;
-
             bool isEnrolled = course.Enrollments != null && course.Enrollments.Contains(userId);
+            bool isAdmin = User.IsInRole(AuthorizationConstants.Roles.Admin) || User.IsInRole(AuthorizationConstants.Roles.Administrator);
 
-            if (!isCreator && !isEnrolled)
+            if (!isCreator && !isEnrolled && !isAdmin)
             {
-                return Forbid("User must be enrolled in the course or be the creator to view module details");
+                return Forbid("User must be enrolled in the course or be the creator or be the admin to view module details");
             }
 
             return module;
         }
-        
+
         [HttpGet("Course/{courseId}")] // get course modules
         public async Task<ActionResult<IEnumerable<Module>>> GetModulesByCourse(Guid courseId, [FromQuery] Guid userId)
         {
@@ -59,6 +60,16 @@ namespace EndavaGrowthspace.Controllers
             if (course == null)
             {
                 return NotFound("Course not found");
+            }
+
+            bool isCreator = course.CreatedBy == userId;
+            bool isEnrolled = course.Enrollments != null && course.Enrollments.Contains(userId);
+            bool isAdmin = User.IsInRole(AuthorizationConstants.Roles.Admin) ||
+                          User.IsInRole(AuthorizationConstants.Roles.Administrator);
+
+            if (!isCreator && !isEnrolled && !isAdmin)
+            {
+                return Forbid("User must be enrolled in the course, be the creator, or an admin to view modules");
             }
 
             var modules = await _context.Modules
@@ -135,9 +146,11 @@ namespace EndavaGrowthspace.Controllers
                 return NotFound();
             }
 
+            bool isAdmin = User.IsInRole(AuthorizationConstants.Roles.Admin) || User.IsInRole(AuthorizationConstants.Roles.Administrator);
+
             if (module.CreatedBy != moduleDto.UserId)
             {
-                return Forbid("Only the creator can update the module");                
+                return Forbid("Only the creator or the admin can update the module");                
             }
 
             module.Title = moduleDto.Title;
@@ -195,9 +208,11 @@ namespace EndavaGrowthspace.Controllers
                 return NotFound();
             }
 
+            bool isAdmin = User.IsInRole(AuthorizationConstants.Roles.Admin) || User.IsInRole(AuthorizationConstants.Roles.Administrator);
+
             if (module.CreatedBy != userId)
             {
-                return Forbid("Only the creator can delete a module");
+                return Forbid("Only the creator or the admin can delete a module");
             }
 
             var course = await _context.Courses.FindAsync(module.CourseId);
